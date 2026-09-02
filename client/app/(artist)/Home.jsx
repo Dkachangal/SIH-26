@@ -2,16 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function ArtistHome() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       
       {/* Top Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.profileIcon}>
+        {/* ADDED: onPress navigation to Profile */}
+        <TouchableOpacity 
+          style={styles.profileIcon} 
+          onPress={() => router.push('/(artist)/Profile')}
+        >
           <Ionicons name="person" size={20} color="#FFFFFF" />
         </TouchableOpacity>
         <TouchableOpacity>
@@ -64,18 +70,24 @@ export default function ArtistHome() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Bottom Navigation Bar (Mocked for Artist View) */}
+      {/* Bottom Navigation Bar */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="home" size={24} color="#1F2937" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="search" size={24} color="#9CA3AF" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+
+        {/* ADDED: onPress navigation to Chat */}
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/(artist)/Chat')}
+        >
           <Ionicons name="chatbubbles-outline" size={24} color="#9CA3AF" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => router.push('/(artist)/Profile')}
+        >
           <Ionicons name="person-outline" size={24} color="#9CA3AF" />
         </TouchableOpacity>
       </View>
@@ -86,7 +98,7 @@ export default function ArtistHome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6', // Light gray background for low cognitive load
+    backgroundColor: '#F3F4F6', 
   },
   header: {
     flexDirection: 'row',
@@ -128,7 +140,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-    paddingLeft: 4, // Visually center the play triangle
+    paddingLeft: 4, 
   },
   audioTitle: {
     fontSize: 16,
@@ -177,7 +189,7 @@ const styles = StyleSheet.create({
   },
   nudgeCard: {
     flexDirection: 'row',
-    backgroundColor: '#F3E8FF', // Light purple for gentle nudges
+    backgroundColor: '#F3E8FF', 
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
