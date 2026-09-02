@@ -49,12 +49,6 @@ export default function ArtistHome() {
           <Text style={styles.addBtnText}>Add New Product</Text>
         </TouchableOpacity>
 
-        {/* Primary Action Button */}
-        <TouchableOpacity style={styles.addBtn} activeOpacity={0.8}>
-          <Ionicons name="add" size={24} color="#FFFFFF" />
-          <Text style={styles.addBtnText}>Add New Product</Text>
-        </TouchableOpacity>
-
         {/* Secondary Actions Grid */}
         <View style={styles.actionGrid}>
           <TouchableOpacity style={styles.gridItem} activeOpacity={0.8}>
