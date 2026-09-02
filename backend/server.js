@@ -9,6 +9,7 @@ const artisanRoutes = require("./src/routes/artisanRoutes");
 const productRoutes = require("./src/routes/productRoutes");
 const imageRoutes = require("./src/routes/imageRoutes");
 const certificateRoutes = require("./src/routes/certificateRoutes");
+const aiCatalogRoutes = require("./src/routes/aiCatalogRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
 app.use("/api/product", imageRoutes);
+app.use("/api/ai", aiCatalogRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/artisans", artisanRoutes);
