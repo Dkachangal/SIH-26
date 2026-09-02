@@ -5,6 +5,7 @@ export default function ArtistLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" />
       <Stack.Screen name="Profile" />
+      <Stack.Screen name="Feed" />
       <Stack.Screen name="Chat" />
       <Stack.Screen name="AddProduct" />
     </Stack>

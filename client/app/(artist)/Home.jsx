@@ -39,6 +39,7 @@ export default function ArtistHome() {
             Namaste, you have 3 new orders. Demand for your Bamboo Baskets is high in your region today. Tap to hear more details.
           </Text>
         </View>
+        
         {/* Primary Action Button */}
         <TouchableOpacity 
           style={styles.addBtn} 
@@ -55,7 +56,13 @@ export default function ArtistHome() {
             <Ionicons name="storefront" size={32} color="#FFFFFF" />
             <Text style={styles.gridText}>My Shop</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.gridItem} activeOpacity={0.8}>
+          
+          {/* ADDED: onPress navigation to Feed (Community) */}
+          <TouchableOpacity 
+            style={styles.gridItem} 
+            activeOpacity={0.8}
+            onPress={() => router.push('/(artist)/Feed')}
+          >
             <Ionicons name="people" size={32} color="#FFFFFF" />
             <Text style={styles.gridText}>Community</Text>
           </TouchableOpacity>
