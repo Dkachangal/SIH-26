@@ -39,6 +39,15 @@ export default function ArtistHome() {
             Namaste, you have 3 new orders. Demand for your Bamboo Baskets is high in your region today. Tap to hear more details.
           </Text>
         </View>
+        {/* Primary Action Button */}
+        <TouchableOpacity 
+          style={styles.addBtn} 
+          activeOpacity={0.8}
+          onPress={() => router.push('/(artist)/AddProduct')}
+        >
+          <Ionicons name="add" size={24} color="#FFFFFF" />
+          <Text style={styles.addBtnText}>Add New Product</Text>
+        </TouchableOpacity>
 
         {/* Primary Action Button */}
         <TouchableOpacity style={styles.addBtn} activeOpacity={0.8}>

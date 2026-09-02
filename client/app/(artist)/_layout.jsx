@@ -6,6 +6,7 @@ export default function ArtistLayout() {
       <Stack.Screen name="Home" />
       <Stack.Screen name="Profile" />
       <Stack.Screen name="Chat" />
+      <Stack.Screen name="AddProduct" />
     </Stack>
   );
 }
