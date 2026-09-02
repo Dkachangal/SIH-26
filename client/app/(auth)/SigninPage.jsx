@@ -1,4 +1,3 @@
-// app/(auth)/SigninPage.jsx
 import React, { useState } from 'react';
 import { 
   View, 
@@ -6,100 +5,84 @@ import {
   StyleSheet, 
   TouchableOpacity, 
   Modal, 
-  FlatList 
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-const LANGUAGES = [
-  { id: 'en', label: 'English', native: 'English' },
-  { id: 'hi', label: 'Hindi', native: 'हिंदी' },
-  { id: 'bn', label: 'Bengali', native: 'বাংলা' },
-  { id: 'ta', label: 'Tamil', native: 'தமிழ்' },
-  { id: 'te', label: 'Telugu', native: 'తెలుగు' },
-];
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function SigninPage() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  
-  const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
+  const { currentLang, currentLanguageDetails, changeLanguage, languages, t, loading } = useLanguage();
+
   const [isLangModalVisible, setLangModalVisible] = useState(false);
 
-  // Future-proofing: Here you would update your global i18n state
-  const handleLanguageSelect = (lang) => {
-    setSelectedLanguage(lang);
+  const handleLanguageSelect = async (langCode) => {
+    await changeLanguage(langCode);
     setLangModalVisible(false);
-  };
-
-  const handleRoleSelection = (role) => {
-    if (role === 'buyer') {
-      router.replace('/(tabs)/Home');
-    } else if (role === 'artist') {
-      router.replace('/(artist)/Home');
-    }
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       
-      {/* Top Bar: Language Selector */}
       <View style={styles.topBar}>
         <TouchableOpacity 
           style={styles.langButton}
           onPress={() => setLangModalVisible(true)}
+          disabled={loading}
         >
-          <Ionicons name="globe-outline" size={20} color="#374151" />
-          <Text style={styles.langButtonText}>{selectedLanguage.native}</Text>
-          <Ionicons name="chevron-down" size={16} color="#374151" />
+          {loading ? (
+            <ActivityIndicator size="small" color="#2563EB" style={{ marginRight: 8 }} />
+          ) : (
+            <Ionicons name="globe-outline" size={20} color="#374151" style={{ marginRight: 6 }} />
+          )}
+          <Text style={styles.langButtonText}>{currentLanguageDetails.native}</Text>
+          <Ionicons name="chevron-down" size={16} color="#374151" style={{ marginLeft: 6 }} />
         </TouchableOpacity>
       </View>
 
-      {/* Main Content */}
       <View style={styles.content}>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.title}>Welcome to ArtisanHub</Text>
-          <Text style={styles.subtitle}>How would you like to use the app today?</Text>
+          <Text style={styles.title}>{t('welcome_title', 'Welcome to ArtisanHub')}</Text>
+          <Text style={styles.subtitle}>
+            {t('welcome_subtitle', 'How would you like to use the app today?')}
+          </Text>
         </View>
 
-        {/* Role Selection Cards */}
         <View style={styles.cardsContainer}>
-          
-          {/* Artist / Seller Card */}
           <TouchableOpacity 
             style={[styles.roleCard, styles.artistCard]}
-            onPress={() => handleRoleSelection('artist')}
+            onPress={() => router.replace('/(artist)/Home')}
             activeOpacity={0.8}
           >
             <View style={styles.iconCircleArtist}>
               <Ionicons name="color-palette-outline" size={48} color="#FFFFFF" />
             </View>
-            <Text style={styles.roleTitle}>I want to Sell</Text>
-            <Text style={styles.roleDescription}>Artist / Seller</Text>
+            <Text style={styles.roleTitle}>{t('role_sell', 'I want to Sell')}</Text>
+            <Text style={styles.roleDescription}>{t('role_artisan', 'Artist / Seller')}</Text>
           </TouchableOpacity>
 
-          {/* Buyer / Customer Card */}
           <TouchableOpacity 
             style={[styles.roleCard, styles.buyerCard]}
-            onPress={() => handleRoleSelection('buyer')}
+            onPress={() => router.replace('/(tabs)/Home')}
             activeOpacity={0.8}
           >
             <View style={styles.iconCircleBuyer}>
               <Ionicons name="cart-outline" size={48} color="#FFFFFF" />
             </View>
-            <Text style={styles.roleTitle}>I want to Buy</Text>
-            <Text style={styles.roleDescription}>Customer / B2B Buyer</Text>
+            <Text style={styles.roleTitle}>{t('role_buy', 'I want to Buy')}</Text>
+            <Text style={styles.roleDescription}>{t('role_buyer', 'Customer / B2B Buyer')}</Text>
           </TouchableOpacity>
-
         </View>
       </View>
 
-      {/* Language Selection Modal */}
       <Modal
         visible={isLangModalVisible}
         transparent={true}
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setLangModalVisible(false)}
       >
         <TouchableOpacity 
@@ -108,23 +91,27 @@ export default function SigninPage() {
           onPress={() => setLangModalVisible(false)}
         >
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Language</Text>
+            <Text style={styles.modalTitle}>Select Language / भाषा चुनें</Text>
             <FlatList
-              data={LANGUAGES}
-              keyExtractor={(item) => item.id}
+              data={languages}
+              keyExtractor={(item) => item.code}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }) => (
                 <TouchableOpacity 
                   style={styles.langOptionItem}
-                  onPress={() => handleLanguageSelect(item)}
+                  onPress={() => handleLanguageSelect(item.code)}
                 >
-                  <Text style={[
-                    styles.langOptionText,
-                    selectedLanguage.id === item.id && styles.langOptionTextSelected
-                  ]}>
-                    {item.native} ({item.label})
-                  </Text>
-                  {selectedLanguage.id === item.id && (
-                    <Ionicons name="checkmark" size={24} color="#2563EB" />
+                  <View>
+                    <Text style={[
+                      styles.nativeText,
+                      currentLang === item.code && styles.activeLangText
+                    ]}>
+                      {item.native}
+                    </Text>
+                    <Text style={styles.labelText}>{item.label}</Text>
+                  </View>
+                  {currentLang === item.code && (
+                    <Ionicons name="checkmark-circle" size={22} color="#2563EB" />
                   )}
                 </TouchableOpacity>
               )}
@@ -132,151 +119,32 @@ export default function SigninPage() {
           </View>
         </TouchableOpacity>
       </Modal>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  langButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  langButtonText: {
-    marginHorizontal: 6,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'center',
-    paddingBottom: 40,
-  },
-  headerTextContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  cardsContainer: {
-    gap: 20,
-  },
-  roleCard: {
-    borderRadius: 24,
-    padding: 30,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  artistCard: {
-    backgroundColor: '#FFEDD5', // Light orange/peach to match original wireframe concept
-    borderWidth: 2,
-    borderColor: '#F97316',
-  },
-  buyerCard: {
-    backgroundColor: '#DCFCE7', // Light green to match original wireframe concept
-    borderWidth: 2,
-    borderColor: '#22C55E',
-  },
-  iconCircleArtist: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#F97316',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  iconCircleBuyer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#22C55E',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  roleTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  roleDescription: {
-    fontSize: 16,
-    color: '#4B5563',
-    fontWeight: '500',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    width: '85%',
-    borderRadius: 20,
-    padding: 24,
-    maxHeight: '70%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  langOptionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  langOptionText: {
-    fontSize: 16,
-    color: '#374151',
-  },
-  langOptionTextSelected: {
-    color: '#2563EB',
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  topBar: { flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 20, paddingTop: 10 },
+  langButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 24, borderWidth: 1, borderColor: '#E5E7EB', elevation: 2 },
+  langButtonText: { fontSize: 15, fontWeight: '700', color: '#1F2937' },
+  content: { flex: 1, paddingHorizontal: 24, justifyContent: 'center', paddingBottom: 40 },
+  headerTextContainer: { alignItems: 'center', marginBottom: 40 },
+  title: { fontSize: 26, fontWeight: '800', color: '#111827', marginBottom: 8, textAlign: 'center' },
+  subtitle: { fontSize: 15, color: '#6B7280', textAlign: 'center' },
+  cardsContainer: { gap: 20 },
+  roleCard: { borderRadius: 24, padding: 28, alignItems: 'center', elevation: 4 },
+  artistCard: { backgroundColor: '#FFEDD5', borderWidth: 2, borderColor: '#F97316' },
+  buyerCard: { backgroundColor: '#DCFCE7', borderWidth: 2, borderColor: '#22C55E' },
+  iconCircleArtist: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#F97316', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  iconCircleBuyer: { width: 76, height: 76, borderRadius: 38, backgroundColor: '#22C55E', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  roleTitle: { fontSize: 22, fontWeight: 'bold', color: '#1F2937', marginBottom: 4 },
+  roleDescription: { fontSize: 15, color: '#4B5563', fontWeight: '500' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, maxHeight: '75%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#111827', marginBottom: 16, textAlign: 'center' },
+  langOptionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  nativeText: { fontSize: 18, fontWeight: '700', color: '#1F2937' },
+  labelText: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  activeLangText: { color: '#2563EB' },
 });
