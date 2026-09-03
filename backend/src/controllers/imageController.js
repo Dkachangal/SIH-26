@@ -34,6 +34,10 @@ const uploadAndEnhanceImages = async (req, res) => {
         // Fallback ObjectId if the user doesn't exist yet, preventing a database crash
         const artisanId = user ? user._id : new mongoose.Types.ObjectId(); 
 
+
+
+// AYUSH - DESCRIPTION API .
+
         // 3. Save Product to Database
         const newProduct = new Product({
             artisan: artisanId,
