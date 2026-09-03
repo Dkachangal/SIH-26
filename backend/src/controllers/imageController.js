@@ -14,6 +14,7 @@ const uploadAndEnhanceImages = async (req, res) => {
             });
         }
 
+        
         // Extract frontend data
         const { name, description, price, email } = req.body;
         const results = [];
