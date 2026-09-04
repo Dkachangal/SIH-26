@@ -6,41 +6,20 @@ const User = require("../models/User"); // Required to find the artisan's Object
 const { enhanceImage } = require("../services/imageService");
 
 const uploadAndEnhanceImages = async (req, res) => {
+    console.log("Received request to upload and enhance images");
     try {
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Please upload at least one image"
-            });
-        }
-        
+
         // Extract frontend data
         const { name, description, price, email } = req.body;
         const results = [];
         const enhancedUrls = [];
-
-        // 1. Process images via AI Service
-        for (const file of req.files) {
-            const originalImageUrl = `${req.protocol}://${req.get("host")}/uploads/original/${file.filename}`;
-            const aiResponse = await enhanceImage(file.path);
-            const enhancedImageUrl = aiResponse.enhancedImageUrl;
-
-            results.push({ originalImageUrl, enhancedImageUrl });
-            enhancedUrls.push(enhancedImageUrl);
-        }
-
-        // 2. Find Artisan (User) ID to satisfy the Product schema ref
-        const user = await User.findOne({ email });
-        // Fallback ObjectId if the user doesn't exist yet, preventing a database crash
-        const artisanId = user ? user._id : new mongoose.Types.ObjectId(); 
-
 
 
 // AYUSH - DESCRIPTION API .
 
         // 3. Save Product to Database
         const newProduct = new Product({
-            artisan: artisanId,
+            artisan: name,
             name: name,
             description: description,
             price: Number(price),

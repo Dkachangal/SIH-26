@@ -74,12 +74,15 @@ export default function AddProduct() {
             // NOTE: Ensure your Node server is actually running on port 5000
             const backendUrl = "http://10.235.253.114:5000/api/product/upload";
 
+            console.log("1 SENDING TO BACKEND>>>>>>>>", formData.data);
+            
+
             const response = await fetch(backendUrl, {
                 method: 'POST',
                 body: formData,
                 // CRITICAL: Do not set Content-Type header manually when using fetch with FormData
             });
-
+            console.log("2 RESPONSE FROM BACKEND>>>>>>>>", response);
             const data = await response.json();
 
             if (response.ok && data.enhancedImageUrls) {

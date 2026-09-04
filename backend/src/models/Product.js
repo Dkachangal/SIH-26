@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema(
   {
     artisan: {
-      type: mongoose.Schema.Types.ObjectId,
+      // type: mongoose.Schema.Types.ObjectId,     // CHANGING THIS TO STRING TEMP
+      type: String,
       ref: "User",
       required: true,
     },
