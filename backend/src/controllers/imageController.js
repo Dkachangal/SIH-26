@@ -13,7 +13,6 @@ const uploadAndEnhanceImages = async (req, res) => {
                 message: "Please upload at least one image"
             });
         }
-
         
         // Extract frontend data
         const { name, description, price, email } = req.body;
