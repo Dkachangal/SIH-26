@@ -7,24 +7,14 @@ const protect = require("../middleware/auth.middleware");
 
 
 // UPLOAD PRODUCT
-router.post(
-    "/products",
-    protect,
-    artistController.uploadProduct
-);
+router.post("/products",protect,artistController.uploadProduct);
 
 
 // VIEW ALL PRODUCTS
-router.get(
-    "/products",
-    artistController.getAllProducts
-);
+router.get("/products", artistController.getAllProducts);
 
 
 // VIEW PRODUCTS OF PARTICULAR ARTISAN
-router.get(
-    "/products/:artisanId",
-    artistController.getMyProducts
-);
+router.get("/products/:artisanId",artistController.getMyProducts);
 
 module.exports = router;
