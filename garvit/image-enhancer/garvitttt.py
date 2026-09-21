@@ -1,12 +1,20 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from rembg import remove
 from PIL import Image, ImageEnhance, ImageFilter
 import numpy as np
 import cv2
 import io
+import os
+import time
 
 app = FastAPI()
+
+ENHANCED_DIR = "enhanced_images"
+os.makedirs(ENHANCED_DIR, exist_ok=True)
+app.mount("/enhanced_images", StaticFiles(directory=ENHANCED_DIR), name="enhanced_images")
+BASE_URL = os.getenv("ENHANCER_BASE_URL", "http://localhost:8001")
+
 
 # ---------------------------------------------------------------------------
 # Color correction 
@@ -58,6 +66,12 @@ def add_padding(fg_image: Image.Image, padding_ratio: float = 0.2) -> Image.Imag
 
 
 def create_gradient_background(width, height, top_color=(196, 188, 205), bottom_color=(140, 132, 150)):
+    """Muted color gradient 'wall' (dusty mauve-gray by default) instead of
+    flat white. Swap top_color/bottom_color for other muted palettes, e.g.
+    sage:  (198, 205, 190) -> (150, 160, 140)
+    slate: (188, 196, 205) -> (120, 130, 145)
+    clay:  (210, 190, 175) -> (160, 135, 120)
+    """
     t = np.linspace(0, 1, height, dtype=np.float32).reshape(height, 1, 1)
     top = np.array(top_color, dtype=np.float32).reshape(1, 1, 3)
     bottom = np.array(bottom_color, dtype=np.float32).reshape(1, 1, 3)
@@ -67,6 +81,10 @@ def create_gradient_background(width, height, top_color=(196, 188, 205), bottom_
 
 
 def create_wall_shadow(fg_image: Image.Image, blur_radius=30, offset=(18, 18), opacity=90):
+    """Casts a soft shadow of the product's own silhouette directly behind it
+    (offset diagonally, like light coming from the front-top-left), instead of
+    squashing it into a floor shadow. Reads as the product mounted in front of
+    a wall with the wall catching its shadow."""
     alpha = fg_image.split()[-1]
     width, height = fg_image.size
 
@@ -97,31 +115,24 @@ def compose_scene(fg_image: Image.Image) -> Image.Image:
     return scene.convert("RGB")
 
 
-# ---------------------------------------------------------------------------
-# API Endpoint
-# ---------------------------------------------------------------------------
-
 @app.post("/enhance")
 async def enhance(image: UploadFile = File(...)):
     raw = await image.read()
 
-    # 1. Remove background via rembg
     no_bg_bytes = remove(raw)
     fg_image = Image.open(io.BytesIO(no_bg_bytes)).convert("RGBA")
 
-    # 2. Process scene and color
     fg_image = add_padding(fg_image, padding_ratio=0.2)
     fg_image = correct_product_colors(fg_image)
     final_pil = compose_scene(fg_image)
 
-    # 3. Final tonal tweaks
     final_pil = ImageEnhance.Brightness(final_pil).enhance(1.02)
     final_pil = ImageEnhance.Color(final_pil).enhance(1.05)
 
-    # 4. Save to an in-memory byte buffer instead of a local folder
-    img_byte_arr = io.BytesIO()
-    final_pil.save(img_byte_arr, format="JPEG", quality=92)
-    img_byte_arr.seek(0)
+    filename = f"enhanced_{int(time.time() * 1000)}.jpg"
+    filepath = os.path.join(ENHANCED_DIR, filename)
+    final_pil.save(filepath, format="JPEG", quality=92)
 
-    # 5. Stream the resulting image bytes back directly
-    return StreamingResponse(img_byte_arr, media_type="image/jpeg")
+    return {
+        "enhancedImageUrl": f"{BASE_URL}/enhanced_images/{filename}"
+    }

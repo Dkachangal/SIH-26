@@ -14,15 +14,15 @@ export default function ArtistUploadHome() {
   const { token } = useAuth();
   const router = useRouter();
   
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]); // Array of base64 image strings
   const [isEnhancing, setIsEnhancing] = useState(false);
-  const [imageEnhanced, setImageEnhanced] = useState(false);
+  const [imagesEnhanced, setImagesEnhanced] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for publishing
   
   const [formData, setFormData] = useState({ 
     name: '', category: 'Textiles', price: '', stock: 1, descriptionRegional: '' 
   });
 
-  // Categories defined dynamically inside the component so they can re-translate instantly
   const CRAFT_CATEGORIES = [
     { id: 'Textiles', icon: 'shirt-outline', label: t('catTextiles') },
     { id: 'Pottery', icon: 'color-palette-outline', label: t('catPottery') },
@@ -31,19 +31,31 @@ export default function ArtistUploadHome() {
     { id: 'Other', icon: 'apps-outline', label: t('catOther') },
   ];
 
-  const pickImage = async () => {
+  const pickImages = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) return Alert.alert("Permission Denied");
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, quality: 0.3, base64: true
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+      allowsMultipleSelection: true, 
+      quality: 0.3, 
+      base64: true
     });
 
-    if (!result.canceled) {
-      setImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    if (!result.canceled && result.assets) {
+      const newBase64Images = result.assets.map(asset => `data:image/jpeg;base64,${asset.base64}`);
+      setImages(prev => [...prev, ...newBase64Images]);
+      
       setIsEnhancing(true);
-      setTimeout(() => { setIsEnhancing(false); setImageEnhanced(true); }, 2000); 
+      setTimeout(() => { 
+        setIsEnhancing(false); 
+        setImagesEnhanced(true); 
+      }, 2000); 
     }
+  };
+
+  const removeImage = (indexToRemove) => {
+    setImages(images.filter((_, index) => index !== indexToRemove));
   };
 
   const adjustStock = (amount) => {
@@ -51,27 +63,42 @@ export default function ArtistUploadHome() {
   };
 
   const handleUpload = async () => {
-    if (!formData.name || !formData.price || !image) {
-      return Alert.alert("Missing Details", "Please add a photo, name, and price.");
+    if (!formData.name || !formData.price || images.length === 0) {
+      return Alert.alert("Missing Details", "Please add at least one photo, name, and price.");
     }
 
+    setLoading(true); // Turn on loading spinner while AI and DB process
     try {
+      const formattedImages = images.map(imgUrl => ({
+        originalUrl: imgUrl,
+        isEnhanced: true
+      }));
+
       const payload = { 
         ...formData, 
         price: Number(formData.price), 
         craftType: formData.category, 
         material: "Auto-detected by AI", 
         descriptionEnglish: "Auto-translated professional description.", 
-        images: [{ originalUrl: image, isEnhanced: true }] 
+        images: formattedImages 
       };
       
-      await axios.post(`${API_URL}/artist/products`, payload, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await axios.post(`${API_URL}/artist/products`, payload, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       
-      setImage(null); setImageEnhanced(false); 
-      setFormData({ name: '', category: 'Textiles', price: '', stock: 1, descriptionRegional: '' });
-      router.push('/(artist)/Profile');
+      if (response.status === 201) {
+        Alert.alert("Success! 🎉", "Your product has been published with AI enhancement.");
+        setImages([]); 
+        setImagesEnhanced(false);
+        setFormData({ name: '', category: 'Textiles', price: '', stock: 1, descriptionRegional: '' });
+        router.push('/(artist)/Profile');
+      }
     } catch (error) { 
-      Alert.alert("Upload Failed", error.message); 
+      console.log("UPLOAD ERROR:", error.response?.data || error.message);
+      Alert.alert("Upload Failed", error.response?.data?.message || "Check your server connection."); 
+    } finally {
+      setLoading(false); // Turn off loading spinner
     }
   };
 
@@ -83,38 +110,53 @@ export default function ArtistUploadHome() {
         <Text style={styles.subtitle}>{t('showcaseCraft')}</Text>
       </View>
 
-      {/* STEP 1: AI PHOTO UPLOAD */}
+      {/* STEP 1: MULTI-IMAGE PICKER & AI PREVIEW */}
       <View style={styles.section}>
         <View style={styles.stepHeader}>
           <View style={styles.stepBadge}><Text style={styles.stepText}>1</Text></View>
-          <Text style={styles.sectionTitle}>{t('step1')}</Text>
+          <Text style={styles.sectionTitle}>{t('step1')} (Multiple Allowed)</Text>
         </View>
         
         <TouchableOpacity 
-          style={[styles.imageUploader, imageEnhanced && styles.imageUploaderSuccess]} 
-          onPress={pickImage} 
+          style={styles.imageUploader} 
+          onPress={pickImages} 
           disabled={isEnhancing}
           activeOpacity={0.8}
         >
           {isEnhancing ? (
             <ActivityIndicator size="large" color="#4f46e5" />
-          ) : image ? (
-            <Image source={{ uri: image }} style={styles.imagePreview} />
           ) : (
             <>
               <View style={styles.magicIconContainer}>
-                <Ionicons name="camera" size={40} color="#4f46e5" />
+                <Ionicons name="images" size={40} color="#4f46e5" />
                 <Ionicons name="sparkles" size={20} color="#f59e0b" style={styles.sparkle} />
               </View>
-              <Text style={styles.uploadText}>{t('tapToAddPhoto')}</Text>
+              <Text style={styles.uploadText}>Tap to select multiple photos</Text>
               <Text style={styles.aiHint}>{t('aiHintClean')}</Text>
             </>
           )}
-          {imageEnhanced && <View style={styles.successBadge}><Ionicons name="checkmark" size={16} color="white" /><Text style={styles.successText}> {t('aiEnhanced')}</Text></View>}
         </TouchableOpacity>
+
+        {images.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.previewReel}>
+            {images.map((imgUri, index) => (
+              <View key={index} style={styles.previewWrapper}>
+                <Image source={{ uri: imgUri }} style={styles.thumbnail} />
+                <TouchableOpacity style={styles.deleteThumbnail} onPress={() => removeImage(index)}>
+                  <Ionicons name="close-circle" size={22} color="#ef4444" />
+                </TouchableOpacity>
+                {imagesEnhanced && (
+                  <View style={styles.thumbBadge}>
+                    <Ionicons name="sparkles" size={10} color="white" />
+                  </View>
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        )}
       </View>
 
-      {/* STEP 2: VISUAL CATEGORY */}
+      {/* STEP 2: CATEGORY SELECTOR */}
       <View style={styles.section}>
         <View style={styles.stepHeader}>
           <View style={styles.stepBadge}><Text style={styles.stepText}>2</Text></View>
@@ -135,7 +177,7 @@ export default function ArtistUploadHome() {
         </ScrollView>
       </View>
 
-      {/* STEP 3: BASIC DETAILS & VOICE INPUT */}
+      {/* STEP 3: DETAILS */}
       <View style={styles.section}>
         <View style={styles.stepHeader}>
           <View style={styles.stepBadge}><Text style={styles.stepText}>3</Text></View>
@@ -167,7 +209,6 @@ export default function ArtistUploadHome() {
           </View>
         </View>
 
-        {/* WhatsApp Style Voice NLP Input */}
         <View style={styles.voiceContainer}>
           <View style={styles.voiceInputBox}>
             <TextInput 
@@ -178,19 +219,23 @@ export default function ArtistUploadHome() {
               onChangeText={t => setFormData({...formData, descriptionRegional: t})} 
             />
           </View>
-          <TouchableOpacity 
-            style={styles.micButton}
-            onPress={() => Alert.alert("Mic Active", "Speak in your native language. Our AI will translate it into a professional English description for buyers.")}
-          >
+          <TouchableOpacity style={styles.micButton} onPress={() => Alert.alert("Mic Active", "Speak description...")}>
             <Ionicons name="mic" size={24} color="white" />
           </TouchableOpacity>
         </View>
         <Text style={styles.voiceHint}>{t('voiceHint')}</Text>
       </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleUpload}>
-        <Ionicons name="cloud-upload-outline" size={24} color="white" style={{ marginRight: 10 }} />
-        <Text style={styles.submitText}>{t('publishToMarket')}</Text>
+      {/* SUBMIT BUTTON WITH LOADING SPINNER */}
+      <TouchableOpacity style={styles.submitButton} onPress={handleUpload} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="white" size="small" />
+        ) : (
+          <>
+            <Ionicons name="cloud-upload-outline" size={24} color="white" style={{ marginRight: 10 }} />
+            <Text style={styles.submitText}>{t('publishToMarket')}</Text>
+          </>
+        )}
       </TouchableOpacity>
 
       <View style={{ height: 40 }} />
@@ -210,15 +255,17 @@ const styles = StyleSheet.create({
   stepText: { color: 'white', fontWeight: 'bold', fontSize: 14 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#1f2937' },
 
-  imageUploader: { backgroundColor: 'white', height: 200, borderRadius: 16, borderWidth: 2, borderColor: '#e5e7eb', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  imageUploaderSuccess: { borderColor: '#10b981', borderStyle: 'solid' },
+  imageUploader: { backgroundColor: 'white', height: 160, borderRadius: 16, borderWidth: 2, borderColor: '#e5e7eb', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   magicIconContainer: { position: 'relative', marginBottom: 10 },
   sparkle: { position: 'absolute', top: -5, right: -10 },
   uploadText: { fontSize: 16, fontWeight: 'bold', color: '#4f46e5' },
   aiHint: { fontSize: 12, color: '#9ca3af', marginTop: 5 },
-  imagePreview: { width: '100%', height: '100%', resizeMode: 'cover' },
-  successBadge: { position: 'absolute', bottom: 10, backgroundColor: '#10b981', flexDirection: 'row', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignItems: 'center' },
-  successText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
+  
+  previewReel: { flexDirection: 'row', marginTop: 15 },
+  previewWrapper: { position: 'relative', marginRight: 12 },
+  thumbnail: { width: 90, height: 90, borderRadius: 12, backgroundColor: '#e5e7eb' },
+  deleteThumbnail: { position: 'absolute', top: -6, right: -6, backgroundColor: 'white', borderRadius: 12 },
+  thumbBadge: { position: 'absolute', bottom: 6, left: 6, backgroundColor: '#10b981', padding: 4, borderRadius: 8 },
 
   categoryScroll: { overflow: 'visible' },
   categoryCard: { backgroundColor: 'white', padding: 15, borderRadius: 16, alignItems: 'center', marginRight: 15, width: 100, elevation: 2 },
