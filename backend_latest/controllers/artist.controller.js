@@ -27,7 +27,7 @@ async function enhanceImageWithPython(base64DataUri) {
         });
 
         // const pythonUrl = process.env.PYTHON_ENHANCER_URL || "http://localhost:8000/enhance";
-        let pythonUrl = process.env.PYTHON_ENHANCER_URL || "http://localhost:8000/enhance";
+        let pythonUrl = process.env.PYTHON_ENHANCER_URL || "https://sih26-f2a6b.containers.snapdeploy.app/enhance";
         
         // Ensure it ends with /enhance just in case
         if (!pythonUrl.endsWith('/enhance')) {
@@ -35,9 +35,12 @@ async function enhanceImageWithPython(base64DataUri) {
         }
 
         // Call Python AI enhancer service
+// Call Python AI enhancer service
         const response = await axios.post(pythonUrl, formData, {
             headers: {
                 ...formData.getHeaders(),
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, image/jpeg, */*'
             },
             responseType: 'arraybuffer', // Expect binary image bytes back
         });
