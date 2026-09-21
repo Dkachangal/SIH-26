@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Modal, Alert, Dimensions } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -15,19 +16,21 @@ export default function BuyerHome() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Modal Preview States
   const [activeProduct, setActiveProduct] = useState(null);
   const [purchaseQty, setPurchaseQty] = useState(1);
   const [fullscreenImages, setFullscreenImages] = useState(null);
 
-  useEffect(() => {
-    fetchMarketplace();
-  }, []);
+  // Automatically fetches data every time the user taps/switches to this tab
+  useFocusEffect(
+    useCallback(() => {
+      fetchMarketplace();
+    }, [])
+  );
 
   const fetchMarketplace = async () => {
     try {
       const response = await axios.get(`${API_URL}/business/products`);
-      setProducts(response.data.products);
+      setProducts(response.data.products || []);
     } catch (error) {
       console.log("MARKETPLACE FETCH ERROR:", error.message);
     } finally {
@@ -113,7 +116,7 @@ export default function BuyerHome() {
           <View style={styles.footer}>
             <Text style={styles.price}>₹{item.price}</Text>
             <View style={styles.clusterBtn}>
-              <Text style={styles.clusterText}>Quick Buy</Text>
+              <Text style={styles.clusterText}>Buy Now</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -158,7 +161,6 @@ export default function BuyerHome() {
         />
       )}
 
-      {/* FULL SCREEN LIGHTBOX */}
       <Modal visible={!!fullscreenImages} transparent={true} animationType="fade">
         <View style={styles.lightboxOverlay}>
           <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setFullscreenImages(null)}>
@@ -177,7 +179,6 @@ export default function BuyerHome() {
         </View>
       </Modal>
 
-      {/* QUICK PREVIEW & BUYING MODAL */}
       <Modal visible={!!activeProduct} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -264,7 +265,6 @@ const styles = StyleSheet.create({
   header: { padding: 20, paddingTop: 60, backgroundColor: 'white' },
   title: { fontSize: 28, fontWeight: '900', color: '#1f2937' },
   sub: { color: '#6b7280', marginTop: 4, fontSize: 15 },
-  
   filterContainer: { backgroundColor: 'white', borderBottomWidth: 1, borderColor: '#f3f4f6' },
   filterScroll: { paddingHorizontal: 15, paddingVertical: 10, alignItems: 'center' },
   filterItem: { alignItems: 'center', justifyContent: 'center', marginRight: 30, paddingBottom: 10, borderBottomWidth: 3, borderColor: 'transparent' },
@@ -272,13 +272,11 @@ const styles = StyleSheet.create({
   filterIcon: { marginBottom: 6 },
   filterText: { color: '#6b7280', fontSize: 13, fontWeight: '600' },
   filterTextActive: { color: '#10b981', fontWeight: '900' },
-
   card: { backgroundColor: 'white', marginHorizontal: 15, marginBottom: 20, borderRadius: 16, overflow: 'hidden', elevation: 4 },
   imageScroll: { width: '100%', height: 250, backgroundColor: '#e5e7eb' },
   image: { width: width - 30, height: 250, resizeMode: 'cover' },
   imageBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
   imageBadgeText: { color: 'white', fontSize: 11, fontWeight: 'bold' },
-
   content: { padding: 18 },
   category: { color: '#10b981', fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase' },
   name: { fontSize: 20, fontWeight: 'bold', marginTop: 6, color: '#111827' },
@@ -287,13 +285,11 @@ const styles = StyleSheet.create({
   price: { fontSize: 22, fontWeight: '900', color: '#111827' },
   clusterBtn: { backgroundColor: '#e6f4ea', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 8 },
   clusterText: { color: '#10b981', fontSize: 13, fontWeight: 'bold' },
-
   lightboxOverlay: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' },
   lightboxCloseBtn: { position: 'absolute', top: 40, right: 20, zIndex: 10, backgroundColor: 'rgba(255,255,255,0.2)', padding: 8, borderRadius: 20 },
   lightboxImage: { width: width, height: height * 0.65, resizeMode: 'contain' },
   lightboxBadge: { position: 'absolute', bottom: 60, backgroundColor: 'rgba(0,0,0,0.8)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
   lightboxBadgeText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
-
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: 'white', height: '90%', borderTopLeftRadius: 28, borderTopRightRadius: 28, overflow: 'hidden' },
   closeBtn: { position: 'absolute', top: 15, right: 15, backgroundColor: 'rgba(255,255,255,0.9)', padding: 8, borderRadius: 20, elevation: 4 },
@@ -302,16 +298,13 @@ const styles = StyleSheet.create({
   modalCategory: { color: '#10b981', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' },
   modalStock: { backgroundColor: '#f3f4f6', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, fontSize: 12, fontWeight: 'bold', color: '#374151' },
   modalTitle: { fontSize: 26, fontWeight: '900', color: '#1f2937', marginBottom: 15 },
-  
   artisanCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0fdf4', borderWidth: 1, borderColor: '#bbf7d0', padding: 15, borderRadius: 16, marginBottom: 20 },
   artisanLabel: { fontSize: 10, fontWeight: 'bold', color: '#166534', textTransform: 'uppercase' },
   artisanName: { fontSize: 16, fontWeight: 'bold', color: '#14532d', marginTop: 2 },
   artisanContact: { fontSize: 12, color: '#15803d', marginTop: 2 },
   chatIconBtn: { backgroundColor: '#10b981', padding: 10, borderRadius: 20 },
-
   sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#1f2937', marginTop: 10, marginBottom: 6 },
   modalDesc: { fontSize: 14, color: '#4b5563', lineHeight: 22 },
-
   bottomActions: { backgroundColor: 'white', padding: 20, borderTopWidth: 1, borderColor: '#f3f4f6' },
   actionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   actionLabel: { fontSize: 16, fontWeight: 'bold', color: '#1f2937' },
@@ -320,7 +313,6 @@ const styles = StyleSheet.create({
   stepperValue: { fontSize: 18, fontWeight: '900', color: '#1f2937', marginHorizontal: 18 },
   buyBtn: { backgroundColor: '#10b981', paddingVertical: 16, borderRadius: 12, alignItems: 'center' },
   buyBtnText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-
   floatingChatBtn: { position: 'absolute', bottom: 20, right: 20, backgroundColor: '#111827', width: 65, height: 65, borderRadius: 32.5, justifyContent: 'center', alignItems: 'center', elevation: 6 },
   floatingChatIcon: { fontSize: 28 }
 });

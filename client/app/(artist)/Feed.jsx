@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator, ScrollView, Modal, Dimensions } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -16,14 +17,17 @@ export default function ArtisanFeed() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [fullscreenImages, setFullscreenImages] = useState(null);
 
-  useEffect(() => {
-    fetchMarketplace();
-  }, []);
+  // Automatically fetches data every time the user taps/switches to this tab
+  useFocusEffect(
+    useCallback(() => {
+      fetchMarketplace();
+    }, [])
+  );
 
   const fetchMarketplace = async () => {
     try {
       const response = await axios.get(`${API_URL}/business/products`);
-      setProducts(response.data.products);
+      setProducts(response.data.products || []);
     } catch (error) {
       console.log("MARKETPLACE FETCH ERROR:", error.message);
     } finally {
@@ -46,7 +50,6 @@ export default function ArtisanFeed() {
     ? products 
     : products.filter(item => item.craftType === selectedCategory || item.category === selectedCategory);
 
-  // Helper to extract both Original and AI Enhanced versions into a unified slide deck
   const getProductImages = (item) => {
     const slides = [];
     if (item.images && item.images.length > 0) {
@@ -134,7 +137,6 @@ export default function ArtisanFeed() {
         />
       )}
 
-      {/* FULL SCREEN LIGHTBOX */}
       <Modal visible={!!fullscreenImages} transparent={true} animationType="fade">
         <View style={styles.lightboxOverlay}>
           <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setFullscreenImages(null)}>
@@ -166,7 +168,6 @@ const styles = StyleSheet.create({
   header: { padding: 20, paddingTop: 60, backgroundColor: 'white' },
   title: { fontSize: 28, fontWeight: '900', color: '#1f2937' },
   sub: { color: '#6b7280', marginTop: 4, fontSize: 15 },
-  
   filterContainer: { backgroundColor: 'white', borderBottomWidth: 1, borderColor: '#f3f4f6' },
   filterScroll: { paddingHorizontal: 15, paddingVertical: 10, alignItems: 'center' },
   filterItem: { alignItems: 'center', justifyContent: 'center', marginRight: 30, paddingBottom: 10, borderBottomWidth: 3, borderColor: 'transparent' },
@@ -174,13 +175,11 @@ const styles = StyleSheet.create({
   filterIcon: { marginBottom: 6 },
   filterText: { color: '#6b7280', fontSize: 13, fontWeight: '600' },
   filterTextActive: { color: '#4f46e5', fontWeight: '900' },
-
   card: { backgroundColor: 'white', marginHorizontal: 15, marginBottom: 20, borderRadius: 16, overflow: 'hidden', elevation: 4 },
   imageScroll: { width: '100%', height: 250, backgroundColor: '#e5e7eb' },
   image: { width: width - 30, height: 250, resizeMode: 'cover' },
   imageBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
   imageBadgeText: { color: 'white', fontSize: 11, fontWeight: 'bold' },
-
   content: { padding: 18 },
   category: { color: '#4f46e5', fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase' },
   name: { fontSize: 20, fontWeight: 'bold', marginTop: 6, color: '#111827' },
@@ -189,13 +188,11 @@ const styles = StyleSheet.create({
   price: { fontSize: 22, fontWeight: '900', color: '#111827' },
   clusterBtn: { backgroundColor: '#f3f4f6', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 8 },
   clusterText: { color: '#374151', fontSize: 13, fontWeight: 'bold' },
-
   lightboxOverlay: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' },
   lightboxCloseBtn: { position: 'absolute', top: 40, right: 20, zIndex: 10, backgroundColor: 'rgba(255,255,255,0.2)', padding: 8, borderRadius: 20 },
   lightboxImage: { width: width, height: height * 0.65, resizeMode: 'contain' },
   lightboxBadge: { position: 'absolute', bottom: 60, backgroundColor: 'rgba(0,0,0,0.8)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
   lightboxBadgeText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
-
   floatingChatBtn: { position: 'absolute', bottom: 20, right: 20, backgroundColor: '#10b981', width: 65, height: 65, borderRadius: 32.5, justifyContent: 'center', alignItems: 'center', elevation: 6 },
   floatingChatIcon: { fontSize: 28 }
 });
