@@ -1,0 +1,482 @@
+KALAA SETU
+AI-Driven Market Linkage and Smart Cataloging Platform for Marginalized Artisans
+
+Problem Statement:
+Marginalized artisans, craftsmen and weavers often face seasonal income gaps and
+difficulty accessing wider markets. Low digital literacy, language barriers,
+limited technical skills and lack of professional product photography and
+cataloging make it difficult for them to participate effectively in digital
+commerce.
+
+Kalaa Setu aims to provide a simple AI-powered digital platform that converts
+basic artisan inputs such as product photographs, native-language voice
+descriptions and expected prices into market-ready product catalogues.
+
+--------------------------------------------------
+1. PROJECT OVERVIEW
+--------------------------------------------------
+
+Kalaa Setu is an AI-driven digital commerce and market-linkage platform designed
+for marginalized artisans and micro-entrepreneurs.
+
+The platform helps artisans create professional digital product catalogues with
+minimal technical knowledge and provides access to both B2C and B2B markets.
+
+The system combines:
+
+- AI-powered image enhancement
+- Multilingual NLP-based catalog generation
+- AI-based product categorization
+- Dynamic ML-based pricing assistance
+- B2C and B2B marketplace
+- B2B artisan clustering
+- Buyer-artisan communication
+- Offline-first functionality
+- Digital product and inventory management
+
+
+--------------------------------------------------
+2. PROPOSED SOLUTION
+--------------------------------------------------
+
+The artisan provides basic product information through a simple interface.
+
+Inputs can include:
+
+- Product image
+- Native-language voice description
+- Expected price
+- Product category/material information
+
+The platform processes these inputs using AI and converts them into a
+professional digital product listing.
+
+The general workflow is:
+
+Artisan Input
+     |
+     v
+AI Image Enhancement
+     |
+     v
+Multilingual NLP Processing
+     |
+     v
+Product Description Generation
+     |
+     v
+Product Categorization
+     |
+     v
+Dynamic Price Suggestion
+     |
+     v
+Digital Catalogue
+     |
+     v
+B2C / B2B Marketplace
+     |
+     v
+Buyers and Market Linkage
+
+
+--------------------------------------------------
+3. AI FEATURES
+--------------------------------------------------
+
+3.1 AI IMAGE ENHANCEMENT
+
+Artisans can upload basic or low-quality product photographs.
+
+The AI image-processing component improves the presentation of the product
+images so that products can be displayed more professionally in the digital
+catalogue.
+
+The objective is to reduce the dependency on professional photography skills.
+
+
+3.2 MULTILINGUAL NLP CATALOGUER
+
+Artisans can provide product descriptions through voice input in their
+native language.
+
+The NLP pipeline processes the description and helps generate structured,
+market-ready product information.
+
+The system can assist with:
+
+- Product title
+- Product description
+- Product attributes
+- Language translation
+- Search-friendly catalogue information
+
+
+3.3 AI PRODUCT CATEGORIZATION
+
+The system automatically categorizes products based on available product
+information.
+
+This helps buyers discover products more easily and improves organization
+within the marketplace.
+
+
+3.4 DYNAMIC ML PRICING ASSISTANT
+
+Kalaa Setu provides a pricing-assistance mechanism for artisans.
+
+The pricing system can consider factors such as:
+
+- Raw material cost
+- Labour hours
+- Regional wage information
+- Product category
+- Material
+- Product complexity
+- Market information
+
+A base price can be calculated from production-related factors, followed by
+a market-based adjustment to generate a suggested selling price.
+
+The pricing assistant is intended to help artisans avoid arbitrary pricing
+and make more informed pricing decisions.
+
+
+--------------------------------------------------
+4. DIGITAL MARKETPLACE
+--------------------------------------------------
+
+Kalaa Setu provides an online gateway where artisan products can be listed
+and discovered by buyers.
+
+The platform supports:
+
+- B2C marketplace
+- B2B marketplace
+- Product catalogues
+- Product search and categorization
+- Product information
+- Artisan storefronts
+- Buyer-artisan communication
+
+
+--------------------------------------------------
+5. B2B ARTISAN CLUSTERING
+--------------------------------------------------
+
+Individual artisans may not always be able to fulfill large B2B orders.
+
+Kalaa Setu therefore supports clustering of artisans.
+
+Artisans producing similar or complementary products can be grouped into
+clusters so that collective supply can be provided to B2B buyers.
+
+This can help with:
+
+- Large orders
+- Collective production
+- Increased supply capacity
+- Wider market participation
+- Better access to institutional buyers
+
+
+--------------------------------------------------
+6. ARTISAN-BUYER COMMUNICATION
+--------------------------------------------------
+
+The platform provides communication between artisans and buyers.
+
+Socket-based real-time communication can be used for buyer-artisan chat.
+
+This allows buyers to communicate with artisans regarding:
+
+- Product details
+- Customization
+- Orders
+- Availability
+- Other product-related requirements
+
+
+--------------------------------------------------
+7. OFFLINE-FIRST FUNCTIONALITY
+--------------------------------------------------
+
+Many artisans may have unreliable internet connectivity.
+
+Kalaa Setu therefore follows an offline-first approach.
+
+Important data can be temporarily stored locally using SQLite cache and
+synchronized with the backend when connectivity becomes available.
+
+This allows artisans to continue important catalogue and product-related
+activities even with intermittent connectivity.
+
+
+--------------------------------------------------
+8. PRODUCT AND CATALOGUE MANAGEMENT
+--------------------------------------------------
+
+The platform provides digital product management functionality.
+
+Product information can include:
+
+- Product name
+- Category
+- Craft type
+- Description
+- Multilingual description
+- Material
+- Images
+- Price
+- Stock
+- Artisan information
+
+AI-enhanced product information can be stored along with the product
+catalogue.
+
+
+--------------------------------------------------
+9. INVENTORY MANAGEMENT
+--------------------------------------------------
+
+The system provides inventory management for artisan products.
+
+Inventory functionality includes:
+
+- Stock tracking
+- Stock increase
+- Stock decrease
+- Low-stock detection
+- Raw-material information
+- Inventory-related notifications
+
+This helps artisans keep track of product availability and avoid problems
+caused by inaccurate stock information.
+
+
+--------------------------------------------------
+10. ORDER MANAGEMENT
+--------------------------------------------------
+
+The platform supports the digital order lifecycle.
+
+Orders can move through different states such as:
+
+- Pending
+- Completed
+- Cancelled
+
+The system can track product quantities, stock reservations and order
+information.
+
+This allows marketplace transactions to be managed systematically.
+
+
+--------------------------------------------------
+11. PAYMENT AND MARKET LINKAGE
+--------------------------------------------------
+
+The platform is designed to support digital payments and online commerce.
+
+UPI/payment gateway integration can be used to facilitate transactions.
+
+Kalaa Setu aims to connect artisans with both individual consumers and
+business/institutional buyers.
+
+The system can also provide integration possibilities with external
+marketplaces and government-oriented platforms.
+
+
+--------------------------------------------------
+12. DATABASE
+--------------------------------------------------
+
+MongoDB is used as the primary database technology.
+
+The database can maintain information related to:
+
+- Users
+- Artisans
+- Products
+- Categories
+- Inventory
+- Orders
+- Marketplace listings
+- Clusters
+- Buyer-artisan interactions
+
+The database structure is designed to support scalable product and marketplace
+operations.
+
+
+--------------------------------------------------
+13. SECURITY
+--------------------------------------------------
+
+The backend uses API-based security mechanisms.
+
+JWT (JSON Web Token) authentication can be used for secure user authentication
+and authorization.
+
+Role-based access can distinguish between different types of users such as:
+
+- Artisan
+- Buyer
+- Admin
+
+API security and controlled access are used to protect user and marketplace
+data.
+
+
+--------------------------------------------------
+14. TECHNOLOGY STACK
+--------------------------------------------------
+
+Frontend:
+- React Native
+
+Backend:
+- Node.js
+- JavaScript
+
+Database:
+- MongoDB
+
+Real-Time Communication:
+- Socket.io
+
+Authentication:
+- JWT
+
+AI / Machine Learning:
+- PyTorch
+- AI image-processing models
+- NLP and translation models
+- Machine-learning based pricing
+
+Local Storage / Offline Support:
+- SQLite cache
+
+Payment:
+- UPI / Payment Gateway
+
+
+--------------------------------------------------
+15. SYSTEM ARCHITECTURE
+--------------------------------------------------
+
+The system follows a modular architecture.
+
+Mobile Application
+        |
+        v
+Node.js Backend
+        |
+        +----------------------+
+        |                      |
+        v                      v
+     MongoDB               AI Services
+        |                      |
+        |              +-------+--------+
+        |              |       |        |
+        |              v       v        v
+        |           Image    NLP     Pricing
+        |          Processing Processing  ML
+        |
+        +----------------------+
+        |
+        v
+Marketplace / Orders / Inventory
+        |
+        v
+Buyers and Artisans
+
+
+--------------------------------------------------
+16. MAJOR BACKEND SERVICES
+--------------------------------------------------
+
+The backend can be organized into modular services such as:
+
+- Authentication service
+- User management service
+- Product service
+- Catalogue service
+- Inventory service
+- Order service
+- Pricing service
+- AI processing service
+- Marketplace service
+- Cluster service
+- Notification service
+- Payment service
+- Communication service
+
+
+--------------------------------------------------
+17. EXPECTED IMPACT
+--------------------------------------------------
+
+Kalaa Setu aims to:
+
+- Provide artisans with year-round digital market access
+- Reduce barriers caused by low digital literacy
+- Help artisans create professional product catalogues
+- Expand market reach beyond local markets
+- Support B2C and B2B commerce
+- Enable collective B2B supply through artisan clusters
+- Improve product discoverability
+- Support better pricing decisions
+- Enable digital communication between buyers and artisans
+- Improve accessibility through multilingual interaction
+- Support artisans with unreliable internet connectivity
+
+
+--------------------------------------------------
+18. LONG-TERM VISION
+--------------------------------------------------
+
+The long-term vision of Kalaa Setu is to create a sustainable digital ecosystem
+for marginalized artisans.
+
+The platform can help transform simple product photographs and native-language
+descriptions into professional digital catalogues and connect artisans with
+consumers, businesses and institutional buyers.
+
+By combining AI, digital commerce, multilingual accessibility, offline-first
+technology and collective B2B supply, Kalaa Setu aims to create a year-round
+digital market channel for traditional artisans and their crafts.
+
+
+--------------------------------------------------
+19. PROJECT SUMMARY
+--------------------------------------------------
+
+Kalaa Setu is an AI-powered digital commerce platform for marginalized
+artisans.
+
+It combines:
+
+AI Image Enhancement
++
+Multilingual NLP
++
+AI Product Categorization
++
+Dynamic ML Pricing
++
+B2C Marketplace
++
+B2B Marketplace
++
+Artisan Clustering
++
+Buyer-Artisan Chat
++
+Offline-First Support
++
+Inventory and Order Management
+
+The platform is designed to make digital commerce more accessible to artisans
+who may have limited technical skills, while providing buyers with a structured
+and searchable marketplace for traditional products and crafts.
