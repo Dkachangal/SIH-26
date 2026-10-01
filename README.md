@@ -20,7 +20,7 @@ Automatically the image processing, text processing, catalogue, description writ
 When Buyers (consumers/businesses) would login, they would see a full marketplace, with category wise division of all the products.
 1) They can add to card, chat / contact the artisan or directly place orders.
 2) A nominal platform fee would be deducted from the buyer per product, for smooth running of the app (this would ensure long term support and self running capability).
-3) # CLUSTERING - large businesses have large needs, single artisan cannot fulfill. Clusters of products having similar quality, design, location would be created automatically using the clustering logic.
+3) CLUSTERING - large businesses have large needs, single artisan cannot fulfill. Clusters of products having similar quality, design, location would be created automatically using the clustering logic.
    Businesses can order from a cluster, that would automatically place order to multiple artisans on it's own. This would make it easier for businesses to come and purchase products, as order fulfilment would be more promising.
 
 KAALA SETU IS AN INITIATIVE :-
