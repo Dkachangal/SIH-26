@@ -23,7 +23,7 @@ When Buyers (consumers/businesses) would login, they would see a full marketplac
 3) CLUSTERING - large businesses have large needs, single artisan cannot fulfill. Clusters of products having similar quality, design, location would be created automatically using the clustering logic.
    Businesses can order from a cluster, that would automatically place order to multiple artisans on it's own. This would make it easier for businesses to come and purchase products, as order fulfilment would be more promising.
 
-KAALA SETU IS AN INITIATIVE :-
+# KAALA SETU IS AN INITIATIVE :-
 1) To bridge the gap between existing/emerging technology, and culture.
 2) To bring forward the talent of the Indian.
 3) To help Indians purchase original products of local artisans in any corner of the country.
